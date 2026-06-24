@@ -44,7 +44,7 @@ typedef struct ENCODER {
   char B_pin;
   char currentState;
   char prevState;
-  int pos;
+  long pos;
 } ENCODER;
 
 void initEncoder(ENCODER &enc, int A_pin, int B_pin, int start_pos) {
@@ -81,9 +81,8 @@ int  servoPos = SERVO_MIN_DEG;
 
 // Stepper encoder
 ENCODER stepperEncoder;
-int stepCount = 0;
-int requiredSteps = 0;
-
+long stepCount = 0;
+long requiredSteps = 0;
 // DC Motor
 unsigned long dcStartTime = 0;
 
