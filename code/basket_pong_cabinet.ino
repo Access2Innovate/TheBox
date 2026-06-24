@@ -6,11 +6,11 @@
 #define BTN_PIN         A1
 
 // Rotary Encoder 1 (Servo)
-#define ENC1_A        10
+#define ENC1_A          10
 #define ENC1_DT         12
 
 // Rotary Encoder 2 (Stepper)
-#define ENC2_A        4
+#define ENC2_A          4
 #define ENC2_DT         6
 
 // Servo
@@ -32,7 +32,7 @@
 // Constants
 #define SERVO_MIN_DEG     42
 #define SERVO_MAX_DEG     80
-#define DC_ON_MS          1100
+#define DC_ON_MS          500
 #define STEPPER_DELAY_US  200   // (2x / step)
 #define STEP_MAX          3500
 #define SERVO_UPDATE_MS   20
