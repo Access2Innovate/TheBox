@@ -29,6 +29,7 @@
 #define STEP_MAX          3500
 #define SERVO_UPDATE_MS   20
 #define LED_UPDATE_MS     1000
+#define LED_COLOUR        0x6F6F6F
 
 // Pretty bad way to prevent it from hanging forever but yk.
 const unsigned long REBOOT_INTERVAL = 120UL * 60UL * 1000UL;
@@ -132,7 +133,7 @@ void setup() {
 
   // LEDs are just white for now
   strip.begin();
-  strip.fill(0xFFFFFF);
+  strip.fill(LED_COLOUR);
   strip.show();
 
   // Home stepper so we know where zero is
@@ -178,7 +179,7 @@ void loop() {
 
   if (now - lastLedUpdate >= LED_UPDATE_MS) {
     lastLedUpdate = now;
-    strip.fill(0xFFFFFF);
+    strip.fill(LED_COLOUR);
     strip.show();
   }
 
