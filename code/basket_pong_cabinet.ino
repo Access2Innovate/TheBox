@@ -1,5 +1,5 @@
 #include <Servo.h>
-#include <Adafruit_DotStar.h>
+#include "LED_Strip.h"  // Always uses pins 11 (data) and 13 (clock)
 
 // ---- Pin definitions ----
 #define BTN_PIN         A1
@@ -18,8 +18,6 @@
 #define LIM_PIN         7
 
 #define NUM_LEDS        30
-#define B_PIN           11
-#define A_PIN           13
 
 // ---- Tuning ----
 #define SERVO_MIN_DEG     42
@@ -27,12 +25,13 @@
 #define DC_ON_MS          500
 #define STEPPER_DELAY_US  200
 #define STEP_MAX          3500
+#define HOMING_MAX_STEPS  (STEP_MAX + 1000)
 #define SERVO_UPDATE_MS   20
 #define LED_UPDATE_MS     1000
 #define LED_COLOUR        0x6F6F6F
 
 // Pretty bad way to prevent it from hanging forever but yk.
-const unsigned long REBOOT_INTERVAL = 120UL * 60UL * 1000UL;
+#define REBOOT_INTERVAL 7200000
 
 // ---- Encoder state ----
 struct ENCODER {
@@ -50,7 +49,6 @@ int readEncoder(ENCODER &enc, int step);
 void stepMotor(int direction);
 
 Servo myServo;
-Adafruit_DotStar strip(NUM_LEDS, B_PIN, A_PIN, DOTSTAR_BGR);
 
 ENCODER servoEncoder;
 ENCODER stepperEncoder;
@@ -64,8 +62,8 @@ unsigned long lastLedUpdate = 0;
 
 // ---- Cursed soft reset ----
 void rebootNow() {
-  void (*resetFunc)(void) = 0;
-  resetFunc();
+  void (*resetFunc)(void) = 0;  // Stack pointer never resets
+  resetFunc();                  // It's prob fine lol
 }
 
 // ---- Encoder setup ----
@@ -132,27 +130,15 @@ void setup() {
   initEncoder(stepperEncoder, ENC2_A, ENC2_DT, 0);
 
   // LEDs are just white for now
-  strip.begin();
-  strip.fill(LED_COLOUR);
-  strip.show();
+  strip_init();
+  strip_fill(NUM_LEDS, LED_COLOUR);
 
   // Home stepper so we know where zero is
   long homingSteps = 0;
-  const long HOMING_MAX_STEPS = STEP_MAX + 1000;
 
   while (digitalRead(LIM_PIN) && homingSteps < HOMING_MAX_STEPS) {
     stepMotor(1);
     homingSteps++;
-  }
-
-  // You can't stop me Keaton.
-  if (homingSteps >= HOMING_MAX_STEPS) {
-    Serial.println("ERROR: Homing failed. Limit switch not reached.");
-    digitalWrite(DC_PIN, LOW);
-
-    while (1) {
-      delay(1000);
-    }
   }
 
   stepCount = 0;
@@ -179,8 +165,7 @@ void loop() {
 
   if (now - lastLedUpdate >= LED_UPDATE_MS) {
     lastLedUpdate = now;
-    strip.fill(LED_COLOUR);
-    strip.show();
+    strip_fill(NUM_LEDS, LED_COLOUR);
   }
 
   // DC motor pulse
