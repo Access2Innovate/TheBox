@@ -5,10 +5,10 @@
 #define BTN_PIN         A1
 
 #define ENC1_A          10
-#define ENC1_DT         12
+#define ENC1_B          12
 
 #define ENC2_A          4
-#define ENC2_DT         6
+#define ENC2_B          6
 
 #define SERVO_PIN       A4
 #define DC_PIN          9
@@ -20,8 +20,8 @@
 #define NUM_LEDS        30
 
 // ---- Tuning ----
-#define SERVO_MIN_DEG     42
-#define SERVO_MAX_DEG     80
+#define SERVO_MIN_DEG     25
+#define SERVO_MAX_DEG     53
 #define DC_ON_MS          500
 #define STEPPER_DELAY_US  200
 #define STEP_MAX          3500
@@ -126,9 +126,9 @@ void setup() {
   myServo.attach(SERVO_PIN);
   myServo.write(SERVO_MIN_DEG);
 
-  initEncoder(servoEncoder, ENC1_A, ENC1_DT, SERVO_MIN_DEG);
-  initEncoder(stepperEncoder, ENC2_A, ENC2_DT, 0);
-
+  initEncoder(servoEncoder, ENC1_A, ENC1_B, SERVO_MIN_DEG);
+  initEncoder(stepperEncoder, ENC2_A, ENC2_B, 0);
+  // im keaton and i stink.
   // LEDs are just white for now
   strip_init();
   strip_fill(NUM_LEDS, LED_COLOUR);
