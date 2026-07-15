@@ -20,7 +20,7 @@
 #define NUM_LEDS        30
 
 // ---- Tuning ----
-#define SERVO_MIN_DEG     25
+#define SERVO_MIN_DEG     30
 #define SERVO_MAX_DEG     53
 #define DC_ON_MS          500
 #define STEPPER_DELAY_US  200
@@ -60,10 +60,12 @@ unsigned long dcStartTime = 0;
 unsigned long lastServoUpdate = 0;
 unsigned long lastLedUpdate = 0;
 
+unsigned long now;
+
 // ---- Cursed soft reset ----
 void rebootNow() {
-  void (*resetFunc)(void) = 0;  // Stack pointer never resets
-  resetFunc();                  // It's prob fine lol
+  void (*resetFunc)(void) = 0;
+  resetFunc();
 }
 
 // ---- Encoder setup ----
@@ -88,7 +90,7 @@ int readEncoder(ENCODER &enc, int step) {
 
   // Works, don't touch unless it starts lying.
   if ((change >> 1) ^ (change & 0x01)) {
-    direction = (((((enc.currentState >> 1) ^ enc.prevState) & 0x01) << 1) - 1) * step;
+    direction = (((enc.currentState ^ (enc.prevState << 1)) & 0x02) - 1) * step;
   }
 
   enc.prevState = enc.currentState;
@@ -128,7 +130,7 @@ void setup() {
 
   initEncoder(servoEncoder, ENC1_A, ENC1_B, SERVO_MIN_DEG);
   initEncoder(stepperEncoder, ENC2_A, ENC2_B, 0);
-  // im keaton and i stink.
+  
   // LEDs are just white for now
   strip_init();
   strip_fill(NUM_LEDS, LED_COLOUR);
@@ -136,9 +138,8 @@ void setup() {
   // Home stepper so we know where zero is
   long homingSteps = 0;
 
-  while (digitalRead(LIM_PIN) && homingSteps < HOMING_MAX_STEPS) {
+  while (digitalRead(LIM_PIN) && homingSteps++ < HOMING_MAX_STEPS) {
     stepMotor(1);
-    homingSteps++;
   }
 
   stepCount = 0;
@@ -148,7 +149,7 @@ void setup() {
 }
 
 void loop() {
-  unsigned long now = millis();
+  now = millis();
 
   // Reboot after a while because this thing is haunted
   if (now >= REBOOT_INTERVAL) {
